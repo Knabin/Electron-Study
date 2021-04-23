@@ -1,10 +1,11 @@
 const { app, BrowserWindow, Menu, Tray } = require('electron')
 const path = require('path')
 
+let win;
 let tray = null;
 
 function createWindow() {
-    const win = new BrowserWindow({
+    win = new BrowserWindow({
         width: 800,
         height: 600,
         webPreferences: {
@@ -25,8 +26,17 @@ app.whenReady().then(() => {
     })
     let iconPath = path.join(__dirname, '/images/test.png');
     tray = new Tray(iconPath);
+    tray.on('double-click', (event, bounds) => {
+        win.show();
+    });
+    
     const contextMenu = Menu.buildFromTemplate([
-        { label: 'Test1', type: 'radio' }
+        { label: 'Normal', type: 'normal', icon: iconPath, click: ()=> {
+            win.show();
+        }},
+        { label: 'Separator', type: 'separator' },
+        { label: 'Checkbox', type: 'checkbox' },
+        { label: 'Radio', type: 'radio' },
     ])
     tray.setToolTip('This is my application.');
     tray.setContextMenu(contextMenu);
