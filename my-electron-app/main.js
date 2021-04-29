@@ -1,23 +1,37 @@
-const { app, BrowserWindow, Menu, Tray } = require('electron')
+const { app, BrowserWindow, Menu, Tray, BrowserView } = require('electron')
 const path = require('path')
 
-let win;
+let mainWindow;
+let webView;
 let tray = null;
 
 function createWindow() {
-    win = new BrowserWindow({
+    mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
+        frame: false,
+        backgroundColor: '#151515',
         webPreferences: {
-            preload: path.join(__dirname, 'preload.js')
+            //preload: path.join(__dirname, 'preload.js')
+            nodeIntegration: true,
         }
     })
 
-    win.loadFile('index.html')
+    mainWindow.loadFile('index.html')
+
+    mainWindow.on('closed', () => {
+        mainWindow = null;
+    });
+
+    webView = new BrowserView();
+    mainWindow.setBrowserView(webView);
+    webView.setBounds({x: 280, y: 70, width: 800 - 280, height: 600 - 70});
+    webView.setAutoResize({width: true, height: true});
+    webView.webContents.loadURL("https://www.electronjs.org");
 }
 
 app.whenReady().then(() => {
-    createWindow()
+    createWindow();
 
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) {
@@ -27,12 +41,12 @@ app.whenReady().then(() => {
     let iconPath = path.join(__dirname, '/images/test.png');
     tray = new Tray(iconPath);
     tray.on('double-click', (event, bounds) => {
-        win.show();
+        mainWindow.show();
     });
     
     const contextMenu = Menu.buildFromTemplate([
         { label: 'Normal', type: 'normal', icon: iconPath, click: ()=> {
-            win.show();
+            mainWindow.show();
         }},
         { label: 'Separator', type: 'separator' },
         { label: 'Checkbox', type: 'checkbox' },
@@ -47,6 +61,12 @@ app.on('window-all-closed', () => {
         app.quit()
     }
 })
+
+app.on('activate', function () {
+    if (mainWindow === null) {
+        createWindow();
+    }
+});
 
 app.setUserTasks([
     {
