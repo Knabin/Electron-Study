@@ -2,6 +2,7 @@
 // be executed in the renderer process for that window.
 // All of the Node.js APIs are available in this process.
 const remote = require('electron').remote;
+const log = require('electron-log')
 
 const win = remote.getCurrentWindow(); /* Note this is different to the
 html global `window` variable */
@@ -10,7 +11,6 @@ html global `window` variable */
 document.onreadystatechange = (event) => {
     if (document.readyState == "complete") {
         handleWindowControls();
-        handleGnbButtons();
     }
 };
 
@@ -19,6 +19,8 @@ window.onbeforeunload = (event) => {
     (DOM element listeners get auto garbage collected but not
     Electron win listeners as the win is not dereferenced unless closed) */
     win.removeAllListeners();
+log.info("renderer.js loaded!");
+
 }
 
 function handleWindowControls() {
@@ -53,8 +55,9 @@ function handleWindowControls() {
     }
 }
 
-function handleGnbButtons() {
-    document.getElementById('just-menu').addEventListener("click", event => {
-
-    });
-}
+// function handleGnbButtons() {
+//     document.getElementById('just-menu').addEventListener("click", event => {
+//         webView.webContents.loadURL("https://www.google.co.kr");
+//         console.log('클릭쓰');
+//     });
+// }

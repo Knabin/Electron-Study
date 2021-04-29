@@ -1,5 +1,6 @@
 const { app, BrowserWindow, Menu, Tray, BrowserView } = require('electron')
 const path = require('path')
+const log = require('electron-log')
 
 let mainWindow;
 let webView;
@@ -12,12 +13,13 @@ function createWindow() {
         frame: false,
         backgroundColor: '#151515',
         webPreferences: {
-            //preload: path.join(__dirname, 'preload.js')
             nodeIntegration: true,
+            enableRemoteModule: true,
+            contextIsolation: false
         }
-    })
+    });
 
-    mainWindow.loadFile('index.html')
+    mainWindow.loadFile('index.html');
 
     mainWindow.on('closed', () => {
         mainWindow = null;
@@ -28,6 +30,7 @@ function createWindow() {
     webView.setBounds({x: 280, y: 70, width: 800 - 280, height: 600 - 70});
     webView.setAutoResize({width: true, height: true});
     webView.webContents.loadURL("https://www.electronjs.org");
+    log.info('main.js loaded');
 }
 
 app.whenReady().then(() => {
@@ -58,7 +61,7 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
-        app.quit()
+        app.quit();
     }
 })
 
@@ -68,13 +71,13 @@ app.on('activate', function () {
     }
 });
 
-app.setUserTasks([
-    {
-        program: process.execPath,
-        arguments: '--new-window',
-        iconPath: process.execPath,
-        iconIndex: 0,
-        title: 'New Window',
-        description: 'Create a new window'
-    }
-])
+// app.setUserTasks([
+//     {
+//         program: process.execPath,
+//         arguments: '--new-window',
+//         iconPath: process.execPath,
+//         iconIndex: 0,
+//         title: 'New Window',
+//         description: 'Create a new window'
+//     }
+// ])
